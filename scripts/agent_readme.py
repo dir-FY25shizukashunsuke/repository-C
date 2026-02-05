@@ -144,9 +144,6 @@ async def main():
                     f.write(markdown)
         except Exception as post_e:
             print(f"[WARN] README後処理でエラー: {post_e}")
-        finally:
-            await client.stop()
-                
         print(f"Successfully updated README.md using AI Agent at {datetime.now()}")
         
     except Exception as e:
