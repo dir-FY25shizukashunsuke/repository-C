@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install Copilot CLI
+        run: npm install -g @github/copilot-cli
+
       - name: Install dependencies
         run: pip install github-copilot-sdk
 

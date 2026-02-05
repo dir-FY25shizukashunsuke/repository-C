@@ -1,6 +1,7 @@
 import os
 import sys
 import asyncio
+import shutil
 from datetime import datetime
 try:
     from copilot import CopilotClient
@@ -41,8 +42,18 @@ def get_repo_context(root_dir):
 async def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     
-    # CopilotClient は環境変数（COPILOT_GITHUB_TOKEN 等）から認証情報を読み込みます
-    client = CopilotClient()
+    # Copilot CLI のバイナリパスを探す (npm install だと copilot-cli の場合がある)
+    copilot_bin = shutil.which("copilot") or shutil.which("copilot-cli")
+    
+    if not copilot_bin:
+        print("Error: 'copilot' or 'copilot-cli' binary not found. Please ensure GitHub Copilot CLI is installed.")
+        sys.exit(1)
+        
+    print(f"Using Copilot CLI binary at: {copilot_bin}")
+    
+    # CopilotClient は環境変数から認証情報を読み込みます
+    # バイナリパスを明示的に指定して初期化します
+    client = CopilotClient(copilot_bin_path=copilot_bin)
     context = get_repo_context(root_dir)
     
     prompt = f"""
