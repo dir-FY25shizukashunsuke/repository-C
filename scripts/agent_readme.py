@@ -45,13 +45,13 @@ def main():
         print("Error: COPILOT_TOKEN environment variable is not set.")
         sys.exit(1)
 
-    client = CopilotClient(token=token)
+    client = CopilotClient(github_token=token)
     context = get_repo_context(root_dir)
     
     prompt = f"""
 あなたはリポジトリのドキュメント作成エキスパートです。
 以下の指示書(SKILL)とリポジトリの実装状況に基づき、最高の README.md を生成してください。
-単なる情報の抽出だけでなく、コードの変更意図を汲み取り、開発者にとって読みやすく価値のあるドキュメントを心がけてください。
+単なる情報の抽出だけでなく、コードの変更意図を汲み取った説明を心がけてください。
 
 【指示書 (SKILL.md)】
 {context['skill']}
@@ -68,24 +68,22 @@ def main():
 【最終更新日時】
 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-指示書に記載されている「推奨される README フォーマット」をベースにしつつ、AIとしての洞察を加えて内容を充実させてください。
+指示書にある「推奨される README フォーマット」をベースにしつつ、AIとしての洞察を加えて内容を充実させてください。
 出力は README.md の中身（Markdown）のみとしてください。
 """
 
-    print("Generating README with GitHub Copilot AI...")
+    print("Generating README with GitHub Copilot AI Agent...")
     try:
-        # Copilot SDK を使用した生成 (エージェントループ)
-        response = client.generate(
-            prompt=prompt,
-            model="gpt-4o", # または Copilot がサポートする最新モデル
-            system_prompt="あなたは提供された実装と指示書から、正確かつインテリジェントなREADMEを作成するエージェントです。"
-        )
-        
-        output_path = os.path.join(root_dir, 'README.md')
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(response.text)
+        # Copilot SDK は Session を通じて操作する
+        with client.create_session() as session:
+            response = session.send_and_wait(prompt)
             
-        print(f"Successfully updated README.md using AI at {datetime.now()}")
+            output_path = os.path.join(root_dir, 'README.md')
+            with open(output_path, 'w', encoding='utf-8') as f:
+                # response の属性名は SDK の仕様に合わせる（text または content）
+                f.write(response.text if hasattr(response, 'text') else str(response))
+            
+        print(f"Successfully updated README.md using AI Agent at {datetime.now()}")
         
     except Exception as e:
         print(f"Error during AI generation: {e}")
