@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate README with AI
         env:
-          COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
         run: python scripts/agent_readme.py
 
       - name: Check git status

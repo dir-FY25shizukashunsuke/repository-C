@@ -41,11 +41,8 @@ def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     token = os.environ.get("COPILOT_TOKEN")
     
-    if not token:
-        print("Error: COPILOT_TOKEN environment variable is not set.")
-        sys.exit(1)
-
-    client = CopilotClient(github_token=token)
+    # CopilotClient は引数なしで初期化し、環境変数（COPILOT_GITHUB_TOKEN 等）から認証情報を読み込みます
+    client = CopilotClient()
     context = get_repo_context(root_dir)
     
     prompt = f"""
