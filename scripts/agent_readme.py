@@ -52,8 +52,8 @@ async def main():
     print(f"Using Copilot CLI binary at: {copilot_bin}")
     
     # CopilotClient は環境変数から認証情報を読み込みます
-    # バイナリパスを明示的に指定して初期化します
-    client = CopilotClient(copilot_bin_path=copilot_bin)
+    # CLI バイナリはインストール済みで PATH に通っているため、引数なしで初期化します
+    client = CopilotClient()
     context = get_repo_context(root_dir)
     
     prompt = f"""
