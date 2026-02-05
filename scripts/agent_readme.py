@@ -101,9 +101,49 @@ async def main():
             
             output_path = os.path.join(root_dir, 'README.md')
             with open(output_path, 'w', encoding='utf-8') as f:
-                # response の形式を確認
-                content = response.text if hasattr(response, 'text') else str(response)
+                # response の形式を確認し、SessionEvent等のラップを除去
+                if hasattr(response, 'content') and response.content:
+                    content = response.content
+                elif hasattr(response, 'text') and response.text:
+                    content = response.text
+                else:
+                    content = str(response)
+
+                # SessionEvent(...content='...') のような文字列から content のみ抽出
+                if isinstance(content, str) and content.startswith('SessionEvent') and ", content='" in content:
+                    import re
+                    # content='...' の部分を非貪欲で抽出（改行・クォート・エスケープも考慮）
+                    m = re.search(r"content='((?:[^']|''|\\')*)'", content, re.DOTALL)
+                    if m:
+                        # Pythonのシングルクォートエスケープ(''や\')を元に戻す
+                        extracted = m.group(1)
+                        extracted = extracted.replace("''", "'").replace("\\'", "'")
+                        content = extracted
+
+                # contentが```markdown ... ```で囲まれている場合、その中身だけを抽出
+                if isinstance(content, str):
+                    m = re.search(r"```markdown\\n(.*?)\\n```", content, re.DOTALL)
+                    if m:
+                        content = m.group(1).strip()
+
+                # Copilot SDKのSessionEvent等でcontentがさらに辞書やオブジェクトの場合は再度抽出
+                if isinstance(content, dict) and 'content' in content:
+                    content = content['content']
                 f.write(content)
+
+        # --- 生成後のREADME.mdからSessionEventラップを除去し、Markdown本文だけにする後処理 ---
+        try:
+            with open(output_path, 'r', encoding='utf-8') as f:
+                raw = f.read()
+            import re
+            # SessionEvent(...content='...') の中の ```markdown ... ``` だけを抽出
+            m = re.search(r"```markdown\\n(.*?)\\n```", raw, re.DOTALL)
+            if m:
+                markdown = m.group(1).strip()
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(markdown)
+        except Exception as post_e:
+            print(f"[WARN] README後処理でエラー: {post_e}")
         finally:
             await client.stop()
                 
