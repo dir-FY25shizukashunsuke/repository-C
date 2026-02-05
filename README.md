@@ -1,1 +1,1 @@
-# Repository-C - User Management System\n\n**repository-C** は、ユーザー管理機能を持つシステムのコアリポジトリです。Flask による本格的な REST API 実装（`repository-A`）と、Python/TypeScript 両対応のビジネスロジック層（`user_management`）を統合し、CRUD 操作、バリデーション、統計情報の取得機能を提供します。\n\nこのプロジェクトは、**プロトタイプから本番への段階的な移行**を設計思想とし、初期のFlask実装を活かしながら、クリーンアーキテクチャを目指したマルチ言語対応のモジュール設計を並行開発しています。\n\n---\n\n## 🏗 ディレクトリ構成\n
+# repository-C Project (Smart README)\n\nユーザー管理機能を持つシステムのコアリポジトリです。\nFlask を使用した API プロトタイプ（`repository-A`）と、クリーンアーキテクチャに基づくビジネスロジック層（`user_management`）を統合し、AI による自動ドキュメント生成戦略を採用しています。\n\n---\n\n## 🏗 ディレクトリ構成\n
