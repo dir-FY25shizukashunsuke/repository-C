@@ -41,7 +41,7 @@ def get_repo_context(root_dir):
 async def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     
-    # CopilotClient は引数なしで初期化し、環境変数（COPILOT_GITHUB_TOKEN 等）から認証情報を読み込みます
+    # CopilotClient は環境変数（COPILOT_GITHUB_TOKEN 等）から認証情報を読み込みます
     client = CopilotClient()
     context = get_repo_context(root_dir)
     
@@ -69,23 +69,30 @@ async def main():
 出力は README.md の中身（Markdown）のみとしてください。
 """
 
-    print("Generating README with GitHub Copilot AI Agent (Async Mode)...")
+    print("Generating README with GitHub Copilot AI Agent (Async Lifecycle Mode)...")
     try:
-        # Copilot SDK は非同期で動作し、async with を推奨します
-        async with client:
+        # CopilotClient のライフサイクル管理 (start/stop)
+        await client.start()
+        try:
+            # セッションの作成と非同期コンテキストマネージャの使用
             async with await client.create_session() as session:
                 response = await session.send_and_wait(prompt)
                 
                 output_path = os.path.join(root_dir, 'README.md')
                 with open(output_path, 'w', encoding='utf-8') as f:
-                    # response の形式を確認。通常は .text または .content 属性を持つ
+                    # response の形式を確認
                     content = response.text if hasattr(response, 'text') else str(response)
                     f.write(content)
+        finally:
+            await client.stop()
                 
         print(f"Successfully updated README.md using AI Agent at {datetime.now()}")
         
     except Exception as e:
         print(f"Error during AI generation: {e}")
+        # 詳細なエラー情報を出すためにトレースバックを表示（デバッグ用）
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":
