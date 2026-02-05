@@ -1,5 +1,6 @@
 import os
 import sys
+import asyncio
 from datetime import datetime
 try:
     from copilot import CopilotClient
@@ -37,9 +38,8 @@ def get_repo_context(root_dir):
     
     return context
 
-def main():
+async def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    token = os.environ.get("COPILOT_TOKEN")
     
     # CopilotClient は引数なしで初期化し、環境変数（COPILOT_GITHUB_TOKEN 等）から認証情報を読み込みます
     client = CopilotClient()
@@ -69,17 +69,19 @@ def main():
 出力は README.md の中身（Markdown）のみとしてください。
 """
 
-    print("Generating README with GitHub Copilot AI Agent...")
+    print("Generating README with GitHub Copilot AI Agent (Async Mode)...")
     try:
-        # Copilot SDK は Session を通じて操作する
-        with client.create_session() as session:
-            response = session.send_and_wait(prompt)
-            
-            output_path = os.path.join(root_dir, 'README.md')
-            with open(output_path, 'w', encoding='utf-8') as f:
-                # response の属性名は SDK の仕様に合わせる（text または content）
-                f.write(response.text if hasattr(response, 'text') else str(response))
-            
+        # Copilot SDK は非同期で動作し、async with を推奨します
+        async with client:
+            async with await client.create_session() as session:
+                response = await session.send_and_wait(prompt)
+                
+                output_path = os.path.join(root_dir, 'README.md')
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    # response の形式を確認。通常は .text または .content 属性を持つ
+                    content = response.text if hasattr(response, 'text') else str(response)
+                    f.write(content)
+                
         print(f"Successfully updated README.md using AI Agent at {datetime.now()}")
         
     except Exception as e:
@@ -87,4 +89,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
