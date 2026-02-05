@@ -21,6 +21,12 @@ def get_repo_context(root_dir):
     # 指示書
     context['skill'] = read_file(os.path.join(root_dir, '.gemini', 'antigravity', 'skills', 'smart-readme', 'SKILL.md'))
     
+    # プロジェクト概要（Agents.md）があれば読み込む
+    agents_path = os.path.join(root_dir, 'Agents.md')
+    if not os.path.exists(agents_path):
+        agents_path = os.path.join(root_dir, '.gemini', 'antigravity', 'Agents.md')
+    context['agents'] = read_file(agents_path)
+    
     # 実装ファイル
     context['app_py'] = read_file(os.path.join(root_dir, 'repository-A', 'app.py'))
     context['user_manager_py'] = read_file(os.path.join(root_dir, 'user_management', 'user_manager.py'))
@@ -63,6 +69,9 @@ async def main():
 
 【指示書 (SKILL.md)】
 {context['skill']}
+
+【プロジェクト概要 (Agents.md)】
+{context['agents'] if context['agents'] else '（ファイル未作成）'}
 
 【ディレクトリ構成】
 {context['structure']}
