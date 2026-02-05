@@ -36,11 +36,17 @@ jobs:
           git status -s
           echo "status=$(git status -s)" >> $GITHUB_OUTPUT
 
-      - name: Commit and Push
+      - name: Commit
         run: |
           git config --local user.name "Github Actions"
           git config --local user.email "action@github.com"
           git add .
           git commit -m "chore: sync submodule and update README [skip ci]"
-          git push origin main
+        if: ${{ steps.status.outputs.status != '' }}
+
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
         if: ${{ steps.status.outputs.status != '' }}
