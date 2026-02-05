@@ -28,7 +28,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install Copilot CLI
-        run: npm install -g @github/copilot-cli
+        run: curl -fsSL https://gh.io/copilot-install | bash
 
       - name: Install dependencies
         run: pip install github-copilot-sdk
