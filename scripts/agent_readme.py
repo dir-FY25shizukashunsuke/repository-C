@@ -131,21 +131,22 @@ async def main():
                     content = content['content']
                 f.write(content)
 
-        # --- 生成後のREADME.mdからSessionEventラップを除去し、Markdown本文だけにする後処理 ---
-        try:
-            with open(output_path, 'r', encoding='utf-8') as f:
-                raw = f.read()
-            import re
-            # SessionEvent(...content='...') の中の ```markdown ... ``` だけを抽出
-            m = re.search(r"```markdown\\n(.*?)\\n```", raw, re.DOTALL)
-            if m:
-                markdown = m.group(1).strip()
-                with open(output_path, 'w', encoding='utf-8') as f:
-                    f.write(markdown)
-        except Exception as post_e:
-            print(f"[WARN] README後処理でエラー: {post_e}")
-        print(f"Successfully updated README.md using AI Agent at {datetime.now()}")
-        
+            # --- 生成後のREADME.mdからSessionEventラップを除去し、Markdown本文だけにする後処理 ---
+            try:
+                with open(output_path, 'r', encoding='utf-8') as f:
+                    raw = f.read()
+                import re
+                # SessionEvent(...content='...') の中の ```markdown ... ``` だけを抽出
+                m = re.search(r"```markdown\\n(.*?)\\n```", raw, re.DOTALL)
+                if m:
+                    markdown = m.group(1).strip()
+                    with open(output_path, 'w', encoding='utf-8') as f:
+                        f.write(markdown)
+            except Exception as post_e:
+                print(f"[WARN] README後処理でエラー: {post_e}")
+            print(f"Successfully updated README.md using AI Agent at {datetime.now()}")
+        finally:
+            await client.stop()
     except Exception as e:
         print(f"Error during AI generation: {e}")
         # 詳細なエラー情報を出すためにトレースバックを表示（デバッグ用）
