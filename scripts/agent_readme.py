@@ -85,15 +85,15 @@ async def main():
         # CopilotClient のライフサイクル管理 (start/stop)
         await client.start()
         try:
-            # セッションの作成と非同期コンテキストマネージャの使用
-            async with await client.create_session() as session:
-                response = await session.send_and_wait(prompt)
-                
-                output_path = os.path.join(root_dir, 'README.md')
-                with open(output_path, 'w', encoding='utf-8') as f:
-                    # response の形式を確認
-                    content = response.text if hasattr(response, 'text') else str(response)
-                    f.write(content)
+            # セッションの作成（このバージョンの SDK では session はコンテキストマネージャではない）
+            session = await client.create_session()
+            response = await session.send_and_wait(prompt)
+            
+            output_path = os.path.join(root_dir, 'README.md')
+            with open(output_path, 'w', encoding='utf-8') as f:
+                # response の形式を確認
+                content = response.text if hasattr(response, 'text') else str(response)
+                f.write(content)
         finally:
             await client.stop()
                 
