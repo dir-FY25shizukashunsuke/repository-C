@@ -7,6 +7,7 @@
 ## 🏗 ディレクトリ構成
 ```text
 - repository-C/
+  - README.md
   - .gitmodules
   - repository-A/
     - requirements.txt
@@ -61,4 +62,4 @@
 
 ## 🕒 最終更新
 このREADMEは自動生成されました。ソースコードの変更を検知して自動で更新されます。
-最終更新日時: 2026-02-05 01:07:58
+最終更新日時: 2026-02-05 01:19:28
