@@ -52,10 +52,23 @@ def get_directory_structure(root_path):
             tree.append(f"{sub_indent}- {f}")
     return "\n".join(tree)
 
+def extract_template_from_skill(skill_path):
+    content = read_file(skill_path)
+    if not content:
+        return None
+    
+    # "推奨される README フォーマット" セクションの中の最初の markdown ブロックを抽出
+    pattern = r"## 推奨される README フォーマット.*?```markdown\n(.*?)\n```"
+    match = re.search(pattern, content, re.DOTALL)
+    if match:
+        return match.group(1)
+    return None
+
 def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     
     # paths
+    skill_path = os.path.join(root_dir, '.gemini', 'antigravity', 'skills', 'smart-readme', 'SKILL.md')
     repo_a_app_path = os.path.join(root_dir, 'repository-A', 'app.py')
     user_mgmt_path = os.path.join(root_dir, 'user_management', 'user_manager.py')
     output_readme_path = os.path.join(root_dir, 'README.md')
@@ -67,7 +80,25 @@ def main():
     
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    readme_template = f"""# Repository-C Project (Smart README)
+    # SKILL.md からテンプレートを読み込む
+    skill_template = extract_template_from_skill(skill_path)
+    
+    if skill_template:
+        print(f"Reading README format from {skill_path}...")
+        # プレースホルダーを置換
+        readme_content = skill_template \
+            .replace("[リポジトリ名]", "Repository-C") \
+            .replace("[概要説明]", "本体プロジェクトとサブモジュールの情報を、ソースコードから自動抽出して管理しています。") \
+            .replace("[ここに自動抽出されたディレクトリツリー]", dir_structure) \
+            .replace("[ここに自動抽出されたルート一覧]", repo_a_routes) \
+            .replace("[ここに自動抽出されたクラス・メソッド一覧]", user_mgmt_details) \
+            .replace("[日時]", now)
+        
+        # リンク追記（スキルの手順に準拠）
+        readme_content += f"\n\n---\nこのREADMEは [Smart README Generator スキル](.gemini/antigravity/skills/smart-readme/SKILL.md) に基づいて自動生成されました。"
+    else:
+        print(f"Skill template not found. Using fallback template.")
+        readme_content = f"""# Repository-C Project (Smart README)
 
 本体プロジェクトとサブモジュールの情報を、ソースコードから自動抽出して管理しています。
 
@@ -95,12 +126,14 @@ def main():
 ---
 
 ## 🕒 最終更新
-このREADMEは自動生成されました。ソースコードの変更を検知して自動で更新されます。
+このREADMEは [Smart README Generator スキル](.gemini/antigravity/skills/smart-readme/SKILL.md) に基づいて自動生成されました。
+ソースコードの変更を検知して自動で更新されます。
+
 最終更新日時: {now}
 """
 
     with open(output_readme_path, 'w', encoding='utf-8') as f:
-        f.write(readme_template)
+        f.write(readme_content)
     
     print(f"Successfully updated README.md at {now}")
 
