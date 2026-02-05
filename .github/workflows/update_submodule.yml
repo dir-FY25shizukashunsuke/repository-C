@@ -33,8 +33,9 @@ jobs:
       - name: Check git status
         id: status
         run: |
-          git status -s
-          echo "status=$(git status -s)" >> $GITHUB_OUTPUT
+          echo "status<<EOF" >> $GITHUB_OUTPUT
+          git status -s >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Commit
         run: |
