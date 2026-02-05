@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 try:
-    from github_copilot import CopilotClient
+    from copilot import CopilotClient
 except ImportError:
     print("Error: github-copilot-sdk is not installed. Please run 'pip install github-copilot-sdk'")
     sys.exit(1)
