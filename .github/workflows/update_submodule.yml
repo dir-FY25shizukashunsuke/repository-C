@@ -1,36 +1,46 @@
-name: Update Submodule
+name: Sync and Update README
 
 on:
   repository_dispatch:
     types:
       - update
-
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  update_submodule:
+  sync_and_update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
           submodules: recursive
+          fetch-depth: 0
+
       - name: Update submodule
         run: git submodule update --remote
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate README
+        run: python scripts/generate_readme.py
+
       - name: Check git status
         id: status
-        run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
-      - name: Commit
+        run: |
+          git status -s
+          echo "status=$(git status -s)" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push
         run: |
           git config --local user.name "Github Actions"
           git config --local user.email "action@github.com"
           git add .
-          git status
-          git commit -m "Update submodule"
-        if: ${{ steps.status.outputs.status }}
-      - name: Push
-        uses: ad-m/github-push-action@master
-        with:
-          branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ steps.status.outputs.status }}
+          git commit -m "chore: sync submodule and update README [skip ci]"
+          git push origin main
+        if: ${{ steps.status.outputs.status != '' }}
