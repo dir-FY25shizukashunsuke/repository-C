@@ -87,7 +87,7 @@ async def main():
         try:
             # セッションの作成（このバージョンの SDK では session はコンテキストマネージャではない）
             session = await client.create_session()
-            response = await session.send_and_wait(prompt)
+            response = await session.send_and_wait({"prompt": prompt})
             
             output_path = os.path.join(root_dir, 'README.md')
             with open(output_path, 'w', encoding='utf-8') as f:
