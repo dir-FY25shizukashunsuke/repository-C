@@ -63,9 +63,11 @@ async def main():
     context = get_repo_context(root_dir)
     
     prompt = f"""
-あなたはリポジトリのドキュメント作成エキスパートです。
-以下の指示書(SKILL)とリポジトリの実装状況に基づき、最高の README.md を生成してください。
-単なる情報の抽出だけでなく、コードの変更意図を汲み取った説明を心がけてください。
+あなたは Smart README Generator です。
+以下の指示書(SKILL.md)・設計コンテキスト(Agents.md)・実装状況(app.py, user_manager.py)を解析し、
+SKILL.mdの「思考プロセス」と「推奨されるREADMEフォーマット」を厳守し、
+開発者にとって重要な情報（APIルート、主要クラス・メソッド、設計意図、拡張計画など）を優先的に強調した
+詳細かつ一貫性のあるREADME.mdを生成してください。
 
 【指示書 (SKILL.md)】
 {context['skill']}
@@ -76,17 +78,40 @@ async def main():
 【ディレクトリ構成】
 {context['structure']}
 
-【実装プロトタイプ (repository-A/app.py)】
+【API実装 (repository-A/app.py)】
 {context['app_py']}
 
-【モジュール機能 (user_management/user_manager.py)】
+【ユーザーモジュール (user_management/user_manager.py)】
 {context['user_manager_py']}
 
 【最終更新日時】
 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-指示書にある「推奨される README フォーマット」をベースにしつつ、AIとしての洞察を加えて内容を充実させてください。
-出力は README.md の中身（Markdown）のみとしてください。
+必ず以下の「推奨されるREADMEフォーマット例」に従い、各セクションを詳細に埋めてください：
+
+---
+# [リポジトリ名] Project (Smart README)
+[概要説明]
+---
+## 🏗 ディレクトリ構成
+```text
+[ここに自動抽出されたディレクトリツリー]
+```
+---
+## 🚀 API エンドポイント (repository-A)
+`repository-A/app.py` から自動抽出。
+[ここに自動抽出されたルート一覧]
+---
+## 🛠 モジュール機能 (user_management)
+`user_management/user_manager.py` から自動抽出。
+[ここに自動抽出されたクラス・メソッド一覧]
+---
+## 🕒 最終更新
+このREADMEは自動生成されました。
+最終更新日時: [日時]
+---
+
+出力はREADME.mdの中身（Markdown）のみとします。
 """
 
     print("Generating README with GitHub Copilot AI Agent (Async Lifecycle Mode)...")
