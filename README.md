@@ -3,7 +3,7 @@
 
 **ユーザー管理機能を持つシステムのコアリポジトリ**
 
-このリポジトリは、プロダクション品質のユーザー管理モジュール（`user_management`）を中心としたクリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
+このリポジトリは、Flask による API プロトタイプ（`repository-A`）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
 
 ---
 
@@ -19,7 +19,13 @@ repository-C/
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
 ├── .gitmodules                  # サブモジュール設定
-├── repository-A/                # サブモジュール（未初期化）
+├── repository-A/                # Flask API プロトタイプ（サブモジュール）
+│   ├── app.py                   # Flask アプリケーション本体
+│   ├── server.js                # Node.js サーバー
+│   ├── db.js                    # データベース接続
+│   ├── requirements.txt         # Python 依存関係
+│   ├── package.json             # Node.js 依存関係
+│   └── test/                    # テスト関連
 └── user_management/             # ユーザー管理モジュール（Python & TypeScript）
     ├── __init__.py              # Python パッケージ初期化
     ├── user_manager.py          # Python ユーザー管理クラス
@@ -32,6 +38,35 @@ repository-C/
         ├── userManager.ts       # ユーザー管理クラス
         └── types.ts             # 型定義
 ```
+
+---
+
+## 🚀 API エンドポイント (repository-A)
+
+`repository-A/app.py` で実装された Flask API エンドポイント一覧。
+
+| メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
+|---------|--------------|------|----------------|-----------|
+| `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
+| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
+| `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
+| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
+
+### セキュリティ機能
+- パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
+- メールアドレス形式検証（正規表現）
+- ユーザー名・メール重複チェック
+- パスワード最小長（6文字以上）
+- SQL インジェクション対策（SQLAlchemy ORM）
+
+### データモデル (`User`)
+| フィールド | 型 | 説明 |
+|-----------|---|------|
+| `id` | Integer | 主キー（自動採番） |
+| `username` | String(80) | ユーザー名（ユニーク） |
+| `email` | String(120) | メールアドレス（ユニーク） |
+| `password` | String(255) | ハッシュ化されたパスワード |
+| `created_at` | DateTime | 登録日時（自動設定） |
 
 ---
 
@@ -111,8 +146,8 @@ interface UserDatabase {
 
 ### クリーンアーキテクチャ
 - **ビジネスロジック層** (`user_management`): インフラストラクチャに依存しない純粋なロジック
-- **明確な境界**: モジュール設計により、疎結合を実現
-- **拡張性**: サブモジュールや新しいインフラ層の追加が容易な構造
+- **インフラ層** (`repository-A`): Flask API、データベース接続
+- **明確な境界**: サブモジュールとモジュールの分離により、疎結合を実現
 
 ### 型安全性
 - Python: `dataclass` + 型ヒント（`typing` モジュール）
@@ -120,10 +155,10 @@ interface UserDatabase {
 - 両言語で一貫したデータモデル
 
 ### セキュリティ
-- **パスワードハッシュ化**: 将来的なAPI実装時に備えた設計
-- **入力バリデーション**: メール形式、パスワード長などの検証
-- **イミュータブル設計**: データの不正な変更を防ぐ
-- **型安全性**: Python型ヒント、TypeScript型システムによる安全性確保
+- パスワードハッシュ化（`werkzeug.security`）
+- SQL インジェクション対策（SQLAlchemy ORM）
+- 入力バリデーション（メール形式、パスワード長）
+- ユニーク制約（ユーザー名・メールの重複防止）
 
 ### 副作用の最小化
 - イミュータブル返却（リストや配列のコピー）
@@ -133,15 +168,14 @@ interface UserDatabase {
 
 ## 🚧 今後の拡張計画
 
-- **REST API 実装**: Flask/FastAPI による API 層の追加
-- **データベース統合**: PostgreSQL/MySQL への永続化
 - **OAuth 認証**: Google/GitHub 連携
 - **ロール管理**: 管理者・一般ユーザーの権限分離
 - **多言語対応**: i18n による国際化
 - **API レスポンス型保証**: OpenAPI / JSON Schema
 - **CI/CD**: GitHub Actions による自動テスト・デプロイ
 - **検索機能拡張**: `search_users` メソッドの実装（名前・メール部分一致）
-- **ユーザー更新機能**: `update_user` メソッドの実装（Python/TypeScript 両方）
+- **ユーザー取得・削除機能**: GET/DELETE `/api/users/<user_id>` エンドポイントの追加
+- **ユーザー統計**: GET `/api/users/stats` エンドポイントの追加
 
 ---
 
@@ -156,4 +190,4 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 07:39:33 (UTC)
+**最終更新日時**: 2026-02-06 07:50:51 (UTC)
