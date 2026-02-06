@@ -57,5 +57,10 @@ jobs:
           BRANCH_NAME="auto/readme-update-$(date +%s)"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
-          PR_URL=$(gh pr create --title "README.md自動更新" --body "CopilotによるREADME.md自動更新依頼" --base main --head "$BRANCH_NAME" --repo "$GITHUB_REPOSITORY")
-          echo "Created PR: $PR_URL"
+          # mainとの差分がある場合のみPR作成
+          if [ "$(git rev-list --count main..$BRANCH_NAME)" -gt 0 ]; then
+            PR_URL=$(gh pr create --title "README.md自動更新" --body "CopilotによるREADME.md自動更新依頼" --base main --head "$BRANCH_NAME" --repo "$GITHUB_REPOSITORY")
+            echo "Created PR: $PR_URL"
+          else
+            echo "No diff with main. PR not created."
+          fi
