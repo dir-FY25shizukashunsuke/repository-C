@@ -209,4 +209,7 @@ def get_todo_stats():
 
 if __name__ == '__main__':
     # 開発用サーバーを起動
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # 注意: 本番環境ではdebug=Falseに設定し、適切なWSGIサーバー（Gunicorn等）を使用してください
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
