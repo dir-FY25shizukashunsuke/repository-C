@@ -57,5 +57,5 @@ jobs:
           BRANCH_NAME="auto/readme-update-$(date +%s)"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
-          PR_URL=$(gh pr create --title "README.md自動更新" --body "CopilotによるREADME.md自動更新依頼" --base main --head "$BRANCH_NAME" --repo "$GITHUB_REPOSITORY" --assignee "@copilot")
+          PR_URL=$(gh pr create --title "README.md自動更新" --body "CopilotによるREADME.md自動更新依頼" --base main --head "$BRANCH_NAME" --repo "$GITHUB_REPOSITORY")
           echo "Created PR: $PR_URL"
