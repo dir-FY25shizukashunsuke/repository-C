@@ -19,7 +19,7 @@ def get_repo_context(root_dir):
     context = {}
     
     # 指示書（SKILL.md）
-    skill_path = os.path.join(root_dir, 'skills', 'update', 'skills', 'smart-readme', 'SKILL.md')
+    skill_path = os.path.join(root_dir, '.github', 'skills', 'update README', 'SKILL.md')
     context['skill'] = read_file(skill_path)
     if not context['skill']:
         print(f"Error: SKILL.mdが見つからないか内容が空です。パス: {skill_path}")
@@ -68,10 +68,8 @@ async def main():
     
     prompt = f"""
 あなたは Smart README Generator です。
-以下の指示書(SKILL.md)・設計コンテキスト(Agents.md)・実装状況(app.py, user_manager.py)を解析し、
-SKILL.mdの「思考プロセス」と「推奨されるREADMEフォーマット」を厳守し、
-開発者にとって重要な情報（APIルート、主要クラス・メソッド、設計意図、拡張計画など）を優先的に強調した
-詳細かつ一貫性のあるREADME.mdを生成してください。
+必ずリポジトリ内の実装（app.py, user_manager.py, src/配下のTypeScriptファイルなど）を詳細に分析し、
+SKILL.md・Agents.mdの指示と設計思想を反映し、実際のコード・API・クラス・メソッド・型定義・ディレクトリ構成を正確にREADMEにまとめてください。
 
 【指示書 (SKILL.md)】
 {context['skill']}
@@ -87,6 +85,10 @@ SKILL.mdの「思考プロセス」と「推奨されるREADMEフォーマット
 
 【ユーザーモジュール (user_management/user_manager.py)】
 {context['user_manager_py']}
+
+【TypeScript実装 (user_management/src/)】
+{read_file(os.path.join(root_dir, 'user_management', 'src', 'userManager.ts'))}
+{read_file(os.path.join(root_dir, 'user_management', 'src', 'types.ts'))}
 
 【最終更新日時】
 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
@@ -109,6 +111,10 @@ SKILL.mdの「思考プロセス」と「推奨されるREADMEフォーマット
 ## 🛠 モジュール機能 (user_management)
 `user_management/user_manager.py` から自動抽出。
 [ここに自動抽出されたクラス・メソッド一覧]
+---
+## 📝 TypeScript型・クラス (user_management/src)
+`user_management/src/userManager.ts` と `types.ts` から自動抽出。
+[ここに自動抽出された型・クラス・メソッド一覧]
 ---
 ## 🕒 最終更新
 このREADMEは自動生成されました。
