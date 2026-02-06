@@ -139,7 +139,7 @@ interface UserDatabase {
 | `constructor(database: UserDatabase)` | `database: UserDatabase` | - | データベースオブジェクトを注入 |
 | `addUser(user: User)` | `user: User` | `void` | ユーザーを追加 |
 | `deleteUser(userId: string)` | `userId: string` | `boolean` | ユーザーを削除（成功: true / 失敗: false） |
-| `getUserById(userId: string)` | `userId: string` | `User \\| undefined` | IDでユーザーを検索 |
+| `getUserById(userId: string)` | `userId: string` | `User \| undefined` | IDでユーザーを検索 |
 | `getAllUsers()` | - | `User[]` | 全ユーザーを取得（スプレッド演算子でコピー） |
 | `getUserCount()` | - | `number` | ユーザー総数を取得 |
 
