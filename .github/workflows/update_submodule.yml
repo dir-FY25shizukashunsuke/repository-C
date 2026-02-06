@@ -35,7 +35,7 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.COPILOT_ASSIGN_PAT }}
         if: ${{ steps.status.outputs.status }}
 
       - name: Create Issue for Copilot
