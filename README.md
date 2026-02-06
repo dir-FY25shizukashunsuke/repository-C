@@ -48,9 +48,9 @@ repository-C/
 | メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
 |---------|--------------|------|----------------|-----------|
 | `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
-| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
+| `POST` | `/api/users/register` | ユーザー登録 | `{ "username": "string", "email": "string", "password": "string", "passwordConfirm": "string" }` | 201: `{ "message", "user" }` / 400: エラー |
 | `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
+| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username": "string", "email": "string" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
 
 ### セキュリティ機能
 - パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
