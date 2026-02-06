@@ -11,6 +11,10 @@
 
 ```text
 repository-C/
+├── .github/                     # GitHub 設定
+│   └── skills/                  # AI スキル定義
+│       └── update README/
+│           └── SKILL.md         # Smart README Generator スキル定義
 ├── AGENTS.md                    # AI コンテキスト・設計思想
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
@@ -22,43 +26,31 @@ repository-C/
 │   ├── requirements.txt         # Python 依存関係
 │   ├── package.json             # Node.js 依存関係
 │   └── test/                    # テスト関連
-│       └── test.md
-├── scripts/                     # ユーティリティスクリプト
-│   ├── generate_readme.py       # README 生成スクリプト
-│   └── agent_readme.py          # AI エージェント
-├── user_management/             # ユーザー管理モジュール（Python & TypeScript）
-│   ├── __init__.py              # Python パッケージ初期化
-│   ├── user_manager.py          # Python ユーザー管理クラス
-│   ├── example.py               # 使用例
-│   ├── README.md                # モジュール説明
-│   ├── package.json             # TypeScript プロジェクト設定
-│   ├── tsconfig.json            # TypeScript コンパイラ設定
-│   └── src/                     # TypeScript ソースコード
-│       ├── index.ts             # エントリーポイント
-│       ├── userManager.ts       # ユーザー管理クラス
-│       └── types.ts             # 型定義
-└── skills/                      # AI スキル定義
-    └── update/
-        └── skills/
-            └── smart-readme/
-                └── SKILL.md     # Smart README Generator スキル定義
+└── user_management/             # ユーザー管理モジュール（Python & TypeScript）
+    ├── __init__.py              # Python パッケージ初期化
+    ├── user_manager.py          # Python ユーザー管理クラス
+    ├── example.py               # 使用例
+    ├── README.md                # モジュール説明
+    ├── package.json             # TypeScript プロジェクト設定
+    ├── tsconfig.json            # TypeScript コンパイラ設定
+    └── src/                     # TypeScript ソースコード
+        ├── index.ts             # エントリーポイント
+        ├── userManager.ts       # ユーザー管理クラス
+        └── types.ts             # 型定義
 ```
 
 ---
 
 ## 🚀 API エンドポイント (repository-A)
 
-`repository-A/app.py` から自動抽出された Flask API エンドポイント一覧。
+`repository-A/app.py` で実装された Flask API エンドポイント一覧。
 
 | メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
 |---------|--------------|------|----------------|-----------|
 | `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
-| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
+| `POST` | `/api/users/register` | ユーザー登録 | `{ "username": "string", "email": "string", "password": "string", "passwordConfirm": "string" }` | 201: `{ "message", "user" }` / 400: エラー |
 | `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `GET` | `/api/users/<user_id>` | ユーザー一件取得 | - | 200: `{ "user": {...} }` / 404: Not Found |
-| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
-| `DELETE` | `/api/users/<user_id>` | ユーザー削除 | - | 200: `{ "message", "user" }` / 404: Not Found |
-| `GET` | `/api/users/stats` | ユーザー統計取得 | - | 200: `{ "total_users": N }` |
+| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username": "string", "email": "string" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
 
 ### セキュリティ機能
 - パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
@@ -164,7 +156,7 @@ interface UserDatabase {
 
 ### セキュリティ
 - パスワードハッシュ化（`werkzeug.security`）
-- SQL インジェクション対策（ORM 使用）
+- SQL インジェクション対策（SQLAlchemy ORM）
 - 入力バリデーション（メール形式、パスワード長）
 - ユニーク制約（ユーザー名・メールの重複防止）
 
@@ -182,14 +174,15 @@ interface UserDatabase {
 - **API レスポンス型保証**: OpenAPI / JSON Schema
 - **CI/CD**: GitHub Actions による自動テスト・デプロイ
 - **検索機能拡張**: `search_users` メソッドの実装（名前・メール部分一致）
-- **ユーザー更新機能**: `update_user` メソッドの実装（Python/TypeScript 両方）
+- **ユーザー取得・削除機能**: GET/DELETE `/api/users/<user_id>` エンドポイントの追加
+- **ユーザー統計**: GET `/api/users/stats` エンドポイントの追加
 
 ---
 
 ## 📚 関連ドキュメント
 
 - **[AGENTS.md](./AGENTS.md)**: AI コンテキスト・設計思想の詳細
-- **[skills/SKILL.md](./skills/update/skills/smart-readme/SKILL.md)**: Smart README Generator の仕様
+- **[.github/skills/update README/SKILL.md](./.github/skills/update%20README/SKILL.md)**: Smart README Generator の仕様
 - **[user_management/README.md](./user_management/README.md)**: ユーザー管理モジュールの詳細
 
 ---
@@ -197,4 +190,4 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 04:36:18 (UTC)
+**最終更新日時**: 2026-02-06 07:50:51 (UTC)
