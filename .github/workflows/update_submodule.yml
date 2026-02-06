@@ -1,16 +1,15 @@
-name: Sync and Update README
+on:
+jobs:
+name: Update Submodule Only
 
 on:
-  repository_dispatch:
-    types:
-      - update
   push:
     branches:
       - main
   workflow_dispatch:
 
-jobs:
-  sync_and_update:
+
+  update_submodule:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,23 +20,6 @@ jobs:
 
       - name: Update submodule
         run: git submodule update --remote
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Copilot CLI
-        run: curl -fsSL https://gh.io/copilot-install | bash
-
-      - name: Install dependencies
-        run: pip install github-copilot-sdk
-
-      - name: Generate README with AI
-        env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
-        run: python scripts/agent_readme.py
-
       - name: Check git status
         id: status
         run: |
