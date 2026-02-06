@@ -3,7 +3,7 @@
 
 **ユーザー管理機能を持つシステムのコアリポジトリ**
 
-このリポジトリは、Flask による API プロトタイプ（`repository-A`）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
+このリポジトリは、プロダクション品質のユーザー管理モジュール（`user_management`）を中心としたクリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
 
 ---
 
@@ -11,70 +11,27 @@
 
 ```text
 repository-C/
+├── .github/                     # GitHub 設定
+│   └── skills/                  # AI スキル定義
+│       └── update README/
+│           └── SKILL.md         # Smart README Generator スキル定義
 ├── AGENTS.md                    # AI コンテキスト・設計思想
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
 ├── .gitmodules                  # サブモジュール設定
-├── repository-A/                # Flask API プロトタイプ（サブモジュール）
-│   ├── app.py                   # Flask アプリケーション本体
-│   ├── server.js                # Node.js サーバー
-│   ├── db.js                    # データベース接続
-│   ├── requirements.txt         # Python 依存関係
-│   ├── package.json             # Node.js 依存関係
-│   └── test/                    # テスト関連
-│       └── test.md
-├── scripts/                     # ユーティリティスクリプト
-│   ├── generate_readme.py       # README 生成スクリプト
-│   └── agent_readme.py          # AI エージェント
-├── user_management/             # ユーザー管理モジュール（Python & TypeScript）
-│   ├── __init__.py              # Python パッケージ初期化
-│   ├── user_manager.py          # Python ユーザー管理クラス
-│   ├── example.py               # 使用例
-│   ├── README.md                # モジュール説明
-│   ├── package.json             # TypeScript プロジェクト設定
-│   ├── tsconfig.json            # TypeScript コンパイラ設定
-│   └── src/                     # TypeScript ソースコード
-│       ├── index.ts             # エントリーポイント
-│       ├── userManager.ts       # ユーザー管理クラス
-│       └── types.ts             # 型定義
-└── skills/                      # AI スキル定義
-    └── update/
-        └── skills/
-            └── smart-readme/
-                └── SKILL.md     # Smart README Generator スキル定義
+├── repository-A/                # サブモジュール（未初期化）
+└── user_management/             # ユーザー管理モジュール（Python & TypeScript）
+    ├── __init__.py              # Python パッケージ初期化
+    ├── user_manager.py          # Python ユーザー管理クラス
+    ├── example.py               # 使用例
+    ├── README.md                # モジュール説明
+    ├── package.json             # TypeScript プロジェクト設定
+    ├── tsconfig.json            # TypeScript コンパイラ設定
+    └── src/                     # TypeScript ソースコード
+        ├── index.ts             # エントリーポイント
+        ├── userManager.ts       # ユーザー管理クラス
+        └── types.ts             # 型定義
 ```
-
----
-
-## 🚀 API エンドポイント (repository-A)
-
-`repository-A/app.py` から自動抽出された Flask API エンドポイント一覧。
-
-| メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
-|---------|--------------|------|----------------|-----------|
-| `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
-| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
-| `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `GET` | `/api/users/<user_id>` | ユーザー一件取得 | - | 200: `{ "user": {...} }` / 404: Not Found |
-| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
-| `DELETE` | `/api/users/<user_id>` | ユーザー削除 | - | 200: `{ "message", "user" }` / 404: Not Found |
-| `GET` | `/api/users/stats` | ユーザー統計取得 | - | 200: `{ "total_users": N }` |
-
-### セキュリティ機能
-- パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
-- メールアドレス形式検証（正規表現）
-- ユーザー名・メール重複チェック
-- パスワード最小長（6文字以上）
-- SQL インジェクション対策（SQLAlchemy ORM）
-
-### データモデル (`User`)
-| フィールド | 型 | 説明 |
-|-----------|---|------|
-| `id` | Integer | 主キー（自動採番） |
-| `username` | String(80) | ユーザー名（ユニーク） |
-| `email` | String(120) | メールアドレス（ユニーク） |
-| `password` | String(255) | ハッシュ化されたパスワード |
-| `created_at` | DateTime | 登録日時（自動設定） |
 
 ---
 
@@ -154,8 +111,8 @@ interface UserDatabase {
 
 ### クリーンアーキテクチャ
 - **ビジネスロジック層** (`user_management`): インフラストラクチャに依存しない純粋なロジック
-- **インフラ層** (`repository-A`): Flask API、データベース接続
-- **明確な境界**: サブモジュールとモジュールの分離により、疎結合を実現
+- **明確な境界**: モジュール設計により、疎結合を実現
+- **拡張性**: サブモジュールや新しいインフラ層の追加が容易な構造
 
 ### 型安全性
 - Python: `dataclass` + 型ヒント（`typing` モジュール）
@@ -163,10 +120,10 @@ interface UserDatabase {
 - 両言語で一貫したデータモデル
 
 ### セキュリティ
-- パスワードハッシュ化（`werkzeug.security`）
-- SQL インジェクション対策（ORM 使用）
-- 入力バリデーション（メール形式、パスワード長）
-- ユニーク制約（ユーザー名・メールの重複防止）
+- **パスワードハッシュ化**: 将来的なAPI実装時に備えた設計
+- **入力バリデーション**: メール形式、パスワード長などの検証
+- **イミュータブル設計**: データの不正な変更を防ぐ
+- **型安全性**: Python型ヒント、TypeScript型システムによる安全性確保
 
 ### 副作用の最小化
 - イミュータブル返却（リストや配列のコピー）
@@ -176,6 +133,8 @@ interface UserDatabase {
 
 ## 🚧 今後の拡張計画
 
+- **REST API 実装**: Flask/FastAPI による API 層の追加
+- **データベース統合**: PostgreSQL/MySQL への永続化
 - **OAuth 認証**: Google/GitHub 連携
 - **ロール管理**: 管理者・一般ユーザーの権限分離
 - **多言語対応**: i18n による国際化
@@ -189,7 +148,7 @@ interface UserDatabase {
 ## 📚 関連ドキュメント
 
 - **[AGENTS.md](./AGENTS.md)**: AI コンテキスト・設計思想の詳細
-- **[skills/SKILL.md](./skills/update/skills/smart-readme/SKILL.md)**: Smart README Generator の仕様
+- **[.github/skills/update README/SKILL.md](./.github/skills/update%20README/SKILL.md)**: Smart README Generator の仕様
 - **[user_management/README.md](./user_management/README.md)**: ユーザー管理モジュールの詳細
 
 ---
@@ -197,4 +156,4 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 04:36:18 (UTC)
+**最終更新日時**: 2026-02-06 07:39:33 (UTC)
