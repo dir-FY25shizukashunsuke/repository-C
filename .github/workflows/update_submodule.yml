@@ -1,10 +1,9 @@
-name: Update Submodule
+name: Update Submodule and Assign Copilot
 
 on:
   repository_dispatch:
     types:
       - update
-
   workflow_dispatch:
 
 jobs:
@@ -15,11 +14,14 @@ jobs:
         with:
           ssh-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
           submodules: recursive
+
       - name: Update submodule
         run: git submodule update --remote
+
       - name: Check git status
         id: status
         run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
+
       - name: Commit
         run: |
           git config --local user.name "Github Actions"
@@ -28,9 +30,32 @@ jobs:
           git status
           git commit -m "Update submodule"
         if: ${{ steps.status.outputs.status }}
+
       - name: Push
         uses: ad-m/github-push-action@master
         with:
           branch: main
           github_token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ steps.status.outputs.status }}
+
+      - name: Create Issue for Copilot
+        if: ${{ steps.status.outputs.status }}
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
+        run: |
+          ISSUE_TITLE="README.mdの自動更新依頼"
+          ISSUE_BODY="更新された内容をもとにREADME.mdを更新して"
+          ISSUE_NUMBER=$(gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" --assignee "@copilot" --repo "$GITHUB_REPOSITORY" --json number -q ".number")
+          echo "Created issue #$ISSUE_NUMBER"
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_ENV
+
+      - name: Create Pull Request
+        if: ${{ steps.status.outputs.status }}
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
+        run: |
+          BRANCH_NAME="auto/readme-update-$(date +%s)"
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+          PR_URL=$(gh pr create --title "README.md自動更新" --body "CopilotによるREADME.md自動更新依頼" --base main --head "$BRANCH_NAME" --repo "$GITHUB_REPOSITORY" --assignee "@copilot" --json url -q ".url")
+          echo "Created PR: $PR_URL"
