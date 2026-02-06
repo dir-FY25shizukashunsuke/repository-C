@@ -18,8 +18,12 @@ def read_file(path):
 def get_repo_context(root_dir):
     context = {}
     
-    # 指示書
-    context['skill'] = read_file(os.path.join(root_dir, '.gemini', 'antigravity', 'skills', 'smart-readme', 'SKILL.md'))
+    # 指示書（SKILL.md）
+    skill_path = os.path.join(root_dir, 'skills', 'update', 'skills', 'smart-readme', 'SKILL.md')
+    context['skill'] = read_file(skill_path)
+    if not context['skill']:
+        print(f"Error: SKILL.mdが見つからないか内容が空です。パス: {skill_path}")
+        sys.exit(1)
     
     # プロジェクト概要（Agents.md）があれば読み込む
     agents_path = os.path.join(root_dir, 'Agents.md')
