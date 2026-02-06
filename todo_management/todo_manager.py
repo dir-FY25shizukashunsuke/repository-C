@@ -101,7 +101,7 @@ class TodoManager:
             return None
         
         if title is not None:
-            # dataclassはイミュータブルなので、新しいインスタンスを作成
+            # イミュータブルなパターンに従い、新しいインスタンスを作成
             updated_todo = Todo(
                 id=todo.id,
                 title=title,
