@@ -1,9 +1,10 @@
-name: Update Submodule Only
+name: Update Submodule
 
 on:
-  push:
-    branches:
-      - main
+  repository_dispatch:
+    types:
+      - update
+
   workflow_dispatch:
 
 jobs:
@@ -14,81 +15,22 @@ jobs:
         with:
           ssh-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
           submodules: recursive
-          fetch-depth: 0
-
       - name: Update submodule
         run: git submodule update --remote
-
       - name: Check git status
         id: status
-        run: |
-          echo "status<<EOF" >> $GITHUB_OUTPUT
-          git status -s >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Generate GitHub App Token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
+        run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
       - name: Commit
         run: |
           git config --local user.name "Github Actions"
           git config --local user.email "action@github.com"
           git add .
-          git commit -m "chore: sync submodule [skip ci]"
-        if: ${{ steps.status.outputs.status != '' }}
-
+          git status
+          git commit -m "Update submodule"
+        if: ${{ steps.status.outputs.status }}
       - name: Push
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ steps.generate_token.outputs.token }}
           branch: main
-        if: ${{ steps.status.outputs.status != '' }}
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-
-  update_submodule:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.GHA_SSH_PRIVATE_KEY }}
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Update submodule
-        run: git submodule update --remote
-      - name: Check git status
-        id: status
-        run: |
-          echo "status<<EOF" >> $GITHUB_OUTPUT
-          git status -s >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Generate GitHub App Token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - name: Commit
-        run: |
-          git config --local user.name "Github Actions"
-          git config --local user.email "action@github.com"
-          git add .
-          git commit -m "chore: sync submodule and update README [skip ci]"
-        if: ${{ steps.status.outputs.status != '' }}
-
-      - name: Push
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ steps.generate_token.outputs.token }}
-          branch: main
-        if: ${{ steps.status.outputs.status != '' }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ steps.status.outputs.status }}
