@@ -3,7 +3,7 @@
 
 **ユーザー管理機能を持つシステムのコアリポジトリ**
 
-このリポジトリは、Flask による API プロトタイプ（`repository-A`）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
+このリポジトリは、Flask（Python）と Express（Node.js）の両方で実装された API プロトタイプ（`repository-A` サブモジュール）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
 
 ---
 
@@ -15,10 +15,10 @@ repository-C/
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
 ├── .gitmodules                  # サブモジュール設定
-├── repository-A/                # Flask API プロトタイプ（サブモジュール）
+├── repository-A/                # Flask & Express API プロトタイプ（サブモジュール）
 │   ├── app.py                   # Flask アプリケーション本体
-│   ├── server.js                # Node.js サーバー
-│   ├── db.js                    # データベース接続
+│   ├── server.js                # Express（Node.js）サーバー
+│   ├── db.js                    # SQLite データベース層（Node.js用）
 │   ├── requirements.txt         # Python 依存関係
 │   ├── package.json             # Node.js 依存関係
 │   └── test/                    # テスト関連
@@ -48,26 +48,43 @@ repository-C/
 
 ## 🚀 API エンドポイント (repository-A)
 
-`repository-A/app.py` から自動抽出された Flask API エンドポイント一覧。
+`repository-A` サブモジュールには、**Flask（Python）** と **Express（Node.js）** の両方で実装されたAPIプロトタイプが含まれています。
+
+### Flask 実装 (`app.py`)
 
 | メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
 |---------|--------------|------|----------------|-----------|
 | `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
 | `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
-| `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `GET` | `/api/users/<user_id>` | ユーザー一件取得 | - | 200: `{ "user": {...} }` / 404: Not Found |
 | `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
-| `DELETE` | `/api/users/<user_id>` | ユーザー削除 | - | 200: `{ "message", "user" }` / 404: Not Found |
-| `GET` | `/api/users/stats` | ユーザー統計取得 | - | 200: `{ "total_users": N }` |
 
-### セキュリティ機能
-- パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
-- メールアドレス形式検証（正規表現）
-- ユーザー名・メール重複チェック
-- パスワード最小長（6文字以上）
-- SQL インジェクション対策（SQLAlchemy ORM）
+**ポート**: 5000
+
+### Express 実装 (`server.js` + `db.js`)
+
+| メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
+|---------|--------------|------|----------------|-----------|
+| `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
+| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
+| `PATCH` | `/api/users/:id` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message" }` / 404: Not Found |
+
+**ポート**: 3000  
+**データベース層**: `db.js` (SQLite + bcrypt)
+
+### セキュリティ機能（両実装共通）
+- **パスワードハッシュ化**:
+  - Flask: `werkzeug.security.generate_password_hash`
+  - Express: `bcrypt` (db.js)
+- **メールアドレス形式検証**: 正規表現による検証
+- **ユーザー名・メール重複チェック**: DB登録前の存在確認
+- **パスワード最小長**: 6文字以上
+- **SQL インジェクション対策**:
+  - Flask: SQLAlchemy ORM
+  - Express: prepared statements (db.js)
 
 ### データモデル (`User`)
+
+**Flask実装 (SQLAlchemy)**:
 | フィールド | 型 | 説明 |
 |-----------|---|------|
 | `id` | Integer | 主キー（自動採番） |
@@ -75,6 +92,9 @@ repository-C/
 | `email` | String(120) | メールアドレス（ユニーク） |
 | `password` | String(255) | ハッシュ化されたパスワード |
 | `created_at` | DateTime | 登録日時（自動設定） |
+
+**Express実装 (SQLite)**:
+同様のスキーマで `db.js` にて管理。`bcrypt` によるパスワードハッシュ化を実装。
 
 ---
 
@@ -154,7 +174,10 @@ interface UserDatabase {
 
 ### クリーンアーキテクチャ
 - **ビジネスロジック層** (`user_management`): インフラストラクチャに依存しない純粋なロジック
-- **インフラ層** (`repository-A`): Flask API、データベース接続
+- **インフラ層** (`repository-A`): 
+  - Flask API（Python、ポート5000）
+  - Express API（Node.js、ポート3000）
+  - データベース接続（SQLAlchemy / SQLite with bcrypt）
 - **明確な境界**: サブモジュールとモジュールの分離により、疎結合を実現
 
 ### 型安全性
@@ -197,4 +220,10 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 04:36:18 (UTC)
+**最終更新日時**: 2026-02-09 07:36:17 (UTC)
+
+---
+
+## 🤖 使用AIモデル
+
+**Claude Sonnet 4**
