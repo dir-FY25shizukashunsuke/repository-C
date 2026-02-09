@@ -7,13 +7,13 @@
 
 ## リポジトリ構造
 - **`repository-A/` (Submodule)**: 
-    - `app.py`: Flask を使用した API の初期プロトタイプ。
-    - API エンドポイントや基本的なルーティングの定義が含まれます。
+    - `app.py`: Flask を使用した API プロトタイプ（ポート: 5000）。
+    - `server.js` + `db.js`: Express を使用した API プロトタイプ（ポート: 3000）。
+    - 両実装は同じ機能を提供し、3つのエンドポイントを持つ（GET /, POST /api/users/register, PATCH /api/users/<id>）。
 - **`user_management/`**: 
     - クリーンな設計を目指したユーザー管理のロジック層。
-    - `user_manager.py`: ユーザーの追加、削除、検索など、ビジネスロジックの中核。
-- **`scripts/`**: 
-    - `agent_readme.py`: GitHub Copilot SDK を活用した AI ドキュメント生成エージェント。
+    - `user_manager.py`: ユーザーの追加、削除、検索など、ビジネスロジックの中核（Python）。
+    - `src/userManager.ts`: TypeScript によるユーザー管理実装。
 
 ## AI オートメーション戦略
 このプロジェクトでは、ドキュメントの鮮度を保つために AI による自動更新を採用しています。
