@@ -3,7 +3,7 @@
 
 **ユーザー管理機能を持つシステムのコアリポジトリ**
 
-このリポジトリは、Flask による API プロトタイプ（`repository-A`）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
+このリポジトリは、Flask・Express による API プロトタイプ（`repository-A` サブモジュール）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
 
 ---
 
@@ -15,17 +15,16 @@ repository-C/
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
 ├── .gitmodules                  # サブモジュール設定
-├── repository-A/                # Flask API プロトタイプ（サブモジュール）
-│   ├── app.py                   # Flask アプリケーション本体
-│   ├── server.js                # Node.js サーバー
-│   ├── db.js                    # データベース接続
+├── 自動化説明資料.md            # 自動化の説明
+├── repository-A/                # API プロトタイプ（サブモジュール）
+│   ├── app.py                   # Flask アプリケーション本体（ポート: 5000）
+│   ├── server.js                # Express サーバー（ポート: 3000）
+│   ├── db.js                    # SQLite データベース接続（Node.js用）
 │   ├── requirements.txt         # Python 依存関係
 │   ├── package.json             # Node.js 依存関係
+│   ├── README.md                # サブモジュール説明
 │   └── test/                    # テスト関連
 │       └── test.md
-├── scripts/                     # ユーティリティスクリプト
-│   ├── generate_readme.py       # README 生成スクリプト
-│   └── agent_readme.py          # AI エージェント
 ├── user_management/             # ユーザー管理モジュール（Python & TypeScript）
 │   ├── __init__.py              # Python パッケージ初期化
 │   ├── user_manager.py          # Python ユーザー管理クラス
@@ -37,28 +36,35 @@ repository-C/
 │       ├── index.ts             # エントリーポイント
 │       ├── userManager.ts       # ユーザー管理クラス
 │       └── types.ts             # 型定義
-└── skills/                      # AI スキル定義
-    └── update/
-        └── skills/
-            └── smart-readme/
-                └── SKILL.md     # Smart README Generator スキル定義
+└── .github/                     # GitHub 設定
+    └── skills/
+        └── update README/
+            └── SKILL.md         # Smart README Generator スキル定義
 ```
 
 ---
 
 ## 🚀 API エンドポイント (repository-A)
 
-`repository-A/app.py` から自動抽出された Flask API エンドポイント一覧。
+`repository-A` サブモジュールには、**Flask** (Python) と **Express** (Node.js) の2つの実装が含まれています。
+
+### Flask 実装 (`app.py`) - ポート: 5000
 
 | メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
 |---------|--------------|------|----------------|-----------|
 | `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
 | `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
-| `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `GET` | `/api/users/<user_id>` | ユーザー一件取得 | - | 200: `{ "user": {...} }` / 404: Not Found |
 | `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
-| `DELETE` | `/api/users/<user_id>` | ユーザー削除 | - | 200: `{ "message", "user" }` / 404: Not Found |
-| `GET` | `/api/users/stats` | ユーザー統計取得 | - | 200: `{ "total_users": N }` |
+
+### Express 実装 (`server.js` + `db.js`) - ポート: 3000
+
+| メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
+|---------|--------------|------|----------------|-----------|
+| `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
+| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
+| `PATCH` | `/api/users/:id` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
+
+**注**: 両実装は同じ機能を提供しますが、異なるポートで動作します。
 
 ### セキュリティ機能
 - パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
@@ -197,4 +203,10 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 04:36:18 (UTC)
+**最終更新日時**: 2026-02-09 08:01:00 (UTC)
+
+---
+
+## 使用 AI モデル
+
+**gpt-5.2-codex**
