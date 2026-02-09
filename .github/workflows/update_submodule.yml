@@ -41,10 +41,10 @@ jobs:
         if: ${{ steps.status.outputs.status }}
         env:
           GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
-          AI_MODEL: "Claude Sonnet 4.5"
+          AI_MODEL: "gpt-5.2-codex"
         run: |
           ISSUE_TITLE="README.mdの自動更新依頼"
-          ISSUE_BODY="更新された内容をもとにREADME.mdを更新して\n\n【注意】\nこのリポジトリにはサブモジュール（repository-A/）が含まれています。\nサブモジュールの内容も必ず確認し、README.mdから説明を削除しないでください。\nサブモジュールの内容は 'git submodule update --init' で取得できます。\n\n【追加指示】\nREADME.mdの最後に、今回利用したAIモデル名（例: Claude Sonnet 4.5等）を必ず明記してください。"
+          ISSUE_BODY="更新された内容をもとにREADME.mdを更新して\n\n【注意】\nこのリポジトリにはサブモジュール（repository-A/）が含まれています。\nサブモジュールの内容も必ず確認し、README.mdから説明を削除しないでください。\nサブモジュールの内容は 'git submodule update --init' で取得できます。\n\n【追加指示】\n必ずgpt-5.2-codexを使ってください。\nREADME.mdの最後に、今回利用したAIモデル名を必ず明記してください。"
           ISSUE_URL=$(gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" --assignee "@copilot" --repo "$GITHUB_REPOSITORY")
           echo "Created issue: $ISSUE_URL"
           ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
