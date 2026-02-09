@@ -3,7 +3,7 @@
 
 **ユーザー管理機能を持つシステムのコアリポジトリ**
 
-このリポジトリは、Flask による API プロトタイプ（`repository-A`）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
+このリポジトリは、Flask/Express による API プロトタイプ（`repository-A` サブモジュール）と、プロダクション品質のユーザー管理モジュール（`user_management`）を統合し、クリーンアーキテクチャに基づいた設計を実現しています。型安全性とセキュリティを重視し、Python と TypeScript の両方でユーザー管理機能を提供します。
 
 ---
 
@@ -15,17 +15,15 @@ repository-C/
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
 ├── .gitmodules                  # サブモジュール設定
-├── repository-A/                # Flask API プロトタイプ（サブモジュール）
-│   ├── app.py                   # Flask アプリケーション本体
-│   ├── server.js                # Node.js サーバー
-│   ├── db.js                    # データベース接続
+├── 自動化説明資料.md             # 自動化ドキュメント
+├── repository-A/                # API プロトタイプ（サブモジュール）
+│   ├── app.py                   # Flask アプリケーション
+│   ├── server.js                # Express/Node.js サーバー
+│   ├── db.js                    # SQLite データベース層（Node.js用）
 │   ├── requirements.txt         # Python 依存関係
 │   ├── package.json             # Node.js 依存関係
+│   ├── README.md                # サブモジュールの説明
 │   └── test/                    # テスト関連
-│       └── test.md
-├── scripts/                     # ユーティリティスクリプト
-│   ├── generate_readme.py       # README 生成スクリプト
-│   └── agent_readme.py          # AI エージェント
 ├── user_management/             # ユーザー管理モジュール（Python & TypeScript）
 │   ├── __init__.py              # Python パッケージ初期化
 │   ├── user_manager.py          # Python ユーザー管理クラス
@@ -37,44 +35,80 @@ repository-C/
 │       ├── index.ts             # エントリーポイント
 │       ├── userManager.ts       # ユーザー管理クラス
 │       └── types.ts             # 型定義
-└── skills/                      # AI スキル定義
-    └── update/
-        └── skills/
-            └── smart-readme/
-                └── SKILL.md     # Smart README Generator スキル定義
+└── .github/                     # GitHub 設定
+    └── skills/                  # AI スキル定義
+        └── update README/
+            └── SKILL.md         # Smart README Generator スキル定義
 ```
 
 ---
 
 ## 🚀 API エンドポイント (repository-A)
 
-`repository-A/app.py` から自動抽出された Flask API エンドポイント一覧。
+### Flask 実装 (`repository-A/app.py`)
+
+Flask ベースの Python API 実装。SQLAlchemy ORM を使用した SQLite データベース連携。
 
 | メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
 |---------|--------------|------|----------------|-----------|
 | `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
 | `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
-| `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `GET` | `/api/users/<user_id>` | ユーザー一件取得 | - | 200: `{ "user": {...} }` / 404: Not Found |
 | `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
-| `DELETE` | `/api/users/<user_id>` | ユーザー削除 | - | 200: `{ "message", "user" }` / 404: Not Found |
-| `GET` | `/api/users/stats` | ユーザー統計取得 | - | 200: `{ "total_users": N }` |
+
+### Express 実装 (`repository-A/server.js` + `db.js`)
+
+Express ベースの Node.js API 実装。専用のデータベース層 (`db.js`) を使用。
+
+| メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
+|---------|--------------|------|----------------|-----------|
+| `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
+| `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
+| `PATCH` | `/api/users/:id` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message" }` / 404: Not Found |
+
+### データベース層 (`repository-A/db.js`)
+
+Node.js 実装専用のデータベース抽象化層。以下の機能を提供：
+
+| 関数 | 説明 |
+|------|------|
+| `initializeDatabase()` | データベーステーブルの初期化 |
+| `registerUser(username, email, password, callback)` | ユーザー登録（bcrypt でパスワードハッシュ化） |
+| `getUserByUsername(username, callback)` | ユーザー名でユーザー取得 |
+| `getAllUsers(callback)` | 全ユーザー取得（パスワード除外） |
+| `getUserById(id, callback)` | ID でユーザー取得 |
+| `updateUser(id, updates, callback)` | ユーザー情報更新 |
+| `deleteUserById(id, callback)` | ユーザー削除 |
+| `getUserStats(callback)` | ユーザー統計取得 |
+| `verifyPassword(plainPassword, hashedPassword, callback)` | パスワード検証 |
+| `closeDatabase()` | データベース接続クローズ |
 
 ### セキュリティ機能
+
+#### Flask 実装
 - パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
 - メールアドレス形式検証（正規表現）
 - ユーザー名・メール重複チェック
 - パスワード最小長（6文字以上）
 - SQL インジェクション対策（SQLAlchemy ORM）
 
+#### Express/Node.js 実装
+- パスワードハッシュ化（`bcryptjs`）
+- メールアドレス形式検証（正規表現）
+- ユーザー名・メール重複チェック（UNIQUE 制約）
+- パスワード最小長（6文字以上）
+- SQL インジェクション対策（パラメータ化クエリ）
+
 ### データモデル (`User`)
+
+両実装で共通のデータモデル：
+
 | フィールド | 型 | 説明 |
 |-----------|---|------|
 | `id` | Integer | 主キー（自動採番） |
-| `username` | String(80) | ユーザー名（ユニーク） |
-| `email` | String(120) | メールアドレス（ユニーク） |
-| `password` | String(255) | ハッシュ化されたパスワード |
-| `created_at` | DateTime | 登録日時（自動設定） |
+| `username` | String(80) / TEXT | ユーザー名（ユニーク） |
+| `email` | String(120) / TEXT | メールアドレス（ユニーク） |
+| `password` | String(255) / TEXT | ハッシュ化されたパスワード |
+| `created_at` | DateTime / DATETIME | 登録日時（自動設定） |
 
 ---
 
@@ -154,8 +188,9 @@ interface UserDatabase {
 
 ### クリーンアーキテクチャ
 - **ビジネスロジック層** (`user_management`): インフラストラクチャに依存しない純粋なロジック
-- **インフラ層** (`repository-A`): Flask API、データベース接続
+- **インフラ層** (`repository-A`): Flask/Express API、データベース接続
 - **明確な境界**: サブモジュールとモジュールの分離により、疎結合を実現
+- **複数実装**: 同じ機能を Flask (Python) と Express (Node.js) で実装し、言語間の移植性を実証
 
 ### 型安全性
 - Python: `dataclass` + 型ヒント（`typing` モジュール）
@@ -163,14 +198,19 @@ interface UserDatabase {
 - 両言語で一貫したデータモデル
 
 ### セキュリティ
-- パスワードハッシュ化（`werkzeug.security`）
-- SQL インジェクション対策（ORM 使用）
+- パスワードハッシュ化（Flask: `werkzeug.security` / Node.js: `bcryptjs`）
+- SQL インジェクション対策（Flask: SQLAlchemy ORM / Node.js: パラメータ化クエリ）
 - 入力バリデーション（メール形式、パスワード長）
 - ユニーク制約（ユーザー名・メールの重複防止）
 
 ### 副作用の最小化
 - イミュータブル返却（リストや配列のコピー）
 - 状態変更を伴うメソッドは明確に `bool` や `None` を返す
+
+### サブモジュール戦略
+- `repository-A` をサブモジュールとして管理し、プロトタイプと本体を分離
+- サブモジュールは独立したリポジトリとして開発可能
+- 初回利用時は `git submodule update --init --recursive` で取得
 
 ---
 
@@ -197,4 +237,4 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 04:36:18 (UTC)
+**最終更新日時**: 2026-02-09 06:49:59 (UTC)
