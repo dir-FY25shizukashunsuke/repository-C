@@ -229,8 +229,9 @@ interface UserDatabase {
 ## 📚 関連ドキュメント
 
 - **[AGENTS.md](./AGENTS.md)**: AI コンテキスト・設計思想の詳細
-- **[skills/SKILL.md](./skills/update/skills/smart-readme/SKILL.md)**: Smart README Generator の仕様
+- **[.github/skills/update README/SKILL.md](./.github/skills/update%20README/SKILL.md)**: Smart README Generator の仕様
 - **[user_management/README.md](./user_management/README.md)**: ユーザー管理モジュールの詳細
+- **[repository-A/README.md](./repository-A/README.md)**: repository-A サブモジュールの詳細
 
 ---
 
