@@ -15,7 +15,13 @@ repository-C/
 ├── README.md                    # 本ファイル（自動生成）
 ├── README_OLD.md                # 旧バージョン
 ├── .gitmodules                  # サブモジュール設定
-├── repository-A/                # Flask API プロトタイプ（サブモジュール）
+├── .github/                     # ワークフローとスキル定義
+│   ├── workflows/
+│   │   └── update_submodule.yml
+│   └── skills/
+│       └── update README/
+│           └── SKILL.md         # Smart README Generator スキル定義
+├── repository-A/                # Flask/Express ユーザーAPI（サブモジュール）
 │   ├── app.py                   # Flask アプリケーション本体
 │   ├── server.js                # Node.js サーバー
 │   ├── db.js                    # データベース接続
@@ -23,9 +29,6 @@ repository-C/
 │   ├── package.json             # Node.js 依存関係
 │   └── test/                    # テスト関連
 │       └── test.md
-├── scripts/                     # ユーティリティスクリプト
-│   ├── generate_readme.py       # README 生成スクリプト
-│   └── agent_readme.py          # AI エージェント
 ├── user_management/             # ユーザー管理モジュール（Python & TypeScript）
 │   ├── __init__.py              # Python パッケージ初期化
 │   ├── user_manager.py          # Python ユーザー管理クラス
@@ -48,20 +51,16 @@ repository-C/
 
 ## 🚀 API エンドポイント (repository-A)
 
-`repository-A/app.py` から自動抽出された Flask API エンドポイント一覧。
+`repository-A/app.py`（Flask）と `repository-A/server.js`（Express）で共通のユーザーAPI。
 
 | メソッド | エンドポイント | 説明 | リクエストボディ | レスポンス |
 |---------|--------------|------|----------------|-----------|
-| `GET` | `/` | ホーム（API 確認用） | - | `{ "message": "ユーザー登録API へようこそ！" }` |
+| `GET` | `/` | ホーム（API 確認用） | - | 200: `{ "message": "ユーザー登録API へようこそ！" }` |
 | `POST` | `/api/users/register` | ユーザー登録 | `{ "username", "email", "password", "passwordConfirm" }` | 201: `{ "message", "user" }` / 400: エラー |
-| `GET` | `/api/users` | ユーザー一覧取得 | - | 200: `{ "users": [...] }` |
-| `GET` | `/api/users/<user_id>` | ユーザー一件取得 | - | 200: `{ "user": {...} }` / 404: Not Found |
-| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新 | `{ "username", "email" }` (任意) | 200: `{ "message", "user" }` / 404: Not Found |
-| `DELETE` | `/api/users/<user_id>` | ユーザー削除 | - | 200: `{ "message", "user" }` / 404: Not Found |
-| `GET` | `/api/users/stats` | ユーザー統計取得 | - | 200: `{ "total_users": N }` |
+| `PATCH` | `/api/users/<user_id>` | ユーザー情報更新（名前/メール） | `{ "username"?, "email"? }` | 200: `{ "message", "user" }` / 404: Not Found / 400: バリデーション |
 
 ### セキュリティ機能
-- パスワードハッシュ化（`werkzeug.security.generate_password_hash`）
+- パスワードハッシュ化（Flask: `werkzeug.security.generate_password_hash` / Express: `bcryptjs`）
 - メールアドレス形式検証（正規表現）
 - ユーザー名・メール重複チェック
 - パスワード最小長（6文字以上）
@@ -189,7 +188,7 @@ interface UserDatabase {
 ## 📚 関連ドキュメント
 
 - **[AGENTS.md](./AGENTS.md)**: AI コンテキスト・設計思想の詳細
-- **[skills/SKILL.md](./skills/update/skills/smart-readme/SKILL.md)**: Smart README Generator の仕様
+- **[Smart README スキル](./.github/skills/update%20README/SKILL.md)**: Smart README Generator の仕様
 - **[user_management/README.md](./user_management/README.md)**: ユーザー管理モジュールの詳細
 
 ---
@@ -197,4 +196,8 @@ interface UserDatabase {
 ## 🕒 最終更新
 
 このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-06 04:36:18 (UTC)
+**最終更新日時**: 2026-02-10 01:28:20 (UTC)
+
+## 使用 AI モデル
+
+- gpt-5.2-codex
