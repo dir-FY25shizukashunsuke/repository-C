@@ -52,14 +52,13 @@ python scripts/generate_readme.py
 
 ---
 
+サブモジュール（repository-A）のAPIエンドポイントやディレクトリ構造を抽出し、一貫性のあるドキュメントを生成します。
 ## 🏗 ディレクトリ構成
 ```text
 [ここに自動抽出されたディレクトリツリー]
-```
 
----
-
-## 🚀 API エンドポイント (repository-A)
+ **APIルート**: `repository-A/app.py`（Flaskの `@app.route`）
+- **構成**: リポジトリ全体のディレクトリ構造（.git, node_modules などは除外）
 `repository-A/app.py` から自動抽出。
 
 [ここに自動抽出されたルート一覧]
@@ -72,9 +71,8 @@ python scripts/generate_readme.py
 [ここに自動抽出されたクラス・メソッド一覧]
 
 ---
-
+ [ここに自動抽出されたクラス・メソッド一覧]
 ## 🕒 最終更新
-このREADMEは自動生成されました。
 最終更新日時: [日時]
 ```
 
