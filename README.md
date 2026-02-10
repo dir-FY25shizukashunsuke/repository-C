@@ -40,11 +40,7 @@ repository-C/
 │       ├── index.ts             # エントリーポイント
 │       ├── userManager.ts       # ユーザー管理クラス
 │       └── types.ts             # 型定義
-└── skills/                      # AI スキル定義
-    └── update/
-        └── skills/
-            └── smart-readme/
-                └── SKILL.md     # Smart README Generator スキル定義
+└── 自動化説明資料.md
 ```
 
 ---
