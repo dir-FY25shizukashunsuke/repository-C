@@ -1,11 +1,11 @@
 name: Update Submodule and Assign Copilot
-
+ 
 on:
   repository_dispatch:
     types:
       - update
   workflow_dispatch:
-
+ 
 jobs:
   update_submodule:
     runs-on: ubuntu-latest
@@ -13,14 +13,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-
+ 
       - name: Update submodule
         run: git submodule update --remote
-
+ 
       - name: Check git status
         id: status
         run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
-
+ 
       - name: Commit
         run: |
           git config --local user.name "Github Actions"
@@ -29,25 +29,18 @@ jobs:
           git status
           git commit -m "Update submodule"
         if: ${{ steps.status.outputs.status }}
-
-      - name: Generate GitHub App Token
-        uses: tibdex/github-app-token@v2
-        id: app_token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
-
+ 
       - name: Push
         uses: ad-m/github-push-action@master
         with:
           branch: main
-          github_token: ${{ steps.app_token.outputs.token }}
+          github_token: ${{ secrets.COPILOT_ASSIGN_PAT }}
         if: ${{ steps.status.outputs.status }}
-
+ 
       - name: Create Issue for Copilot
         if: ${{ steps.status.outputs.status }}
         env:
-          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
           AI_MODEL: "gpt-5.2-codex"
         run: |
           ISSUE_TITLE="README.mdの自動更新依頼"
@@ -56,11 +49,11 @@ jobs:
           echo "Created issue: $ISSUE_URL"
           ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
           echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_ENV
-
+ 
       - name: Create Pull Request
         if: ${{ steps.status.outputs.status }}
         env:
-          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
         run: |
           BRANCH_NAME="auto/readme-update-$(date +%s)"
           git checkout -b "$BRANCH_NAME"
