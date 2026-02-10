@@ -28,29 +28,27 @@ description: リポジトリの実装（APIやクラス）を解析してREADME.
 ### 1. 情報の抽出
 以下のソースをスキャンして情報を収集します：
 - **APIルート**: `repository-A/app.py`（Flaskの `@app.route`）
-- **モジュール機能**: `user_management/user_manager.py`（クラスとパブリックメソッド）
+複数サブモジュール（例：repository-A, repository-Bなど）のAPIエンドポイントやディレクトリ構造を抽出し、一貫性のある統合ドキュメントを生成します。
 - **構成**: リポジトリ全体のディレクトリ構造（`.git`, `node_modules` 等は除外）
 
 ### 2. スクリプトの実行
-`scripts/generate_readme.py` を使用して、抽出された情報を整形し、ルートの `README.md` を生成します。
 
 ```powershell
 python scripts/generate_readme.py
 ```
 
-### 3. 内容の検証
-生成された `README.md` が最新の `app.py` や `user_manager.py` の実装（新しいメソッドや削除されたルートなど）と一致しているか、AIとしてダブルチェックします。
+- **APIルート**: 各サブモジュール（例：`repository-A/app.py`, `repository-B/xxx.py`等）のAPIルート
+- **構成**: リポジトリ全体および各サブモジュールのディレクトリ構造（.git, node_modules などは除外）
 
 ## 推奨される README フォーマット
 
 以下は `README.md` の標準テンプレートです。抽出された情報は各セクションに埋め込まれます。
 
-```markdown
+[ここに自動抽出されたサブモジュールごとのAPI・構成一覧]
 # [リポジトリ名] Project (Smart README)
 
 [概要説明]
 
----
 
 サブモジュール（repository-A）のAPIエンドポイントやディレクトリ構造を抽出し、一貫性のあるドキュメントを生成します。
 ## 🏗 ディレクトリ構成
