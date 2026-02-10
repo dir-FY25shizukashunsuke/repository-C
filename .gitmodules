@@ -1,3 +1,6 @@
 [submodule "repository-A"]
 	path = repository-A
 	url = https://github.com/dir-FY25shizukashunsuke/repository-A.git
+[submodule "repository-B"]
+	path = repository-B
+	url = https://github.com/dir-FY25shizukashunsuke/repository-B
