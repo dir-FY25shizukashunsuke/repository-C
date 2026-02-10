@@ -19,7 +19,9 @@ jobs:
  
       - name: Check git status
         id: status
-        run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
+        run: |
+          status=$(git status -s | tr -d '\n' | sed 's/^ *//')
+          echo "status=$status" >> $GITHUB_OUTPUT
  
       - name: Commit
         run: |
