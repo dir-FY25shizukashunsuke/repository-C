@@ -106,7 +106,7 @@ repository-C/
 - **複数サブモジュール管理**: repository-A（ユーザー登録API）、repository-B（FastAPI）など、複数のサブモジュールを統合管理
 - **2つの実装パターン**: repository-Aでは Flask と Node.js/Express の両方の実装を提供し、開発者が選択可能
 - **自動化ワークフロー**: GitHub Actionsによるサブモジュール更新、Issue作成、AI資料生成の完全自動化
-- **AI活用**: AGENTS.md と SKILL.md に基づき、AIが最新の実装状況を自動反映
+- **AI活用**: AGENTS.md と SKILL.mdに基づき、AIが最新の実装状況を自動反映
 
 ### 今後の拡張例
 - サブモジュールの多段管理
@@ -121,7 +121,8 @@ repository-C/
 ## 📚 関連ドキュメント
 
 - **[AGENTS.md](./AGENTS.md)**: AI コンテキスト・設計思想の詳細
-- **[SKILL.md](./.github/skills/update%20README/SKILL.md)**: Smart README Generator の仕様
+- **[機能定義書.md](./機能定義書.md)**: APIエンドポイント、データモデル、セキュリティ機能の統合ドキュメント
+- **[シーケンス図.md](./シーケンス図.md)**: 処理フロー、API呼び出しシーケンスのMermaid図
 - **[自動化説明資料.md](./自動化説明資料.md)**: GitHub Actions 自動化ワークフローの詳細解説
 
 ---
