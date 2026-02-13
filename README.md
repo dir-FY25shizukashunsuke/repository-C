@@ -129,11 +129,11 @@ repository-C/
 
 ## 🕒 最終更新
 
-このREADMEは **Smart README Generator** により自動生成されました。  
-**最終更新日時**: 2026-02-10 04:46:00 (UTC)
+このREADMEは **Smart README Generator** により自動生成されました。
+**最終更新日時**: 2026-02-10 08:24:00 (UTC)
 
 ---
 
 ## 使用 AI モデル
 
-**gpt-5.2-codex**
+**Claude Sonnet 4.5** (model ID: claude-sonnet-4-5-20250929)
