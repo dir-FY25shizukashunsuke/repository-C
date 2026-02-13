@@ -45,7 +45,7 @@ jobs:
           GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
         run: |
           ISSUE_TITLE="機能定義書・シーケンス図の自動更新依頼"
-          ISSUE_BODY="サブモジュールが更新されました。更新された内容をもとに機能定義書.mdとシーケンス図.mdを更新してほしい。【注意】このリポジトリにはサブモジュール（repository-A/, repository-B/）が含まれています。サブモジュールの内容も必ず確認し、機能定義書.md・シーケンス図.mdから説明を削除しないでください。サブモジュールの内容は 'git submodule update --init --recursive' で取得できます。【追加指示】機能定義書.md・シーケンス図.mdの更新履歴セクションに、今回利用したAIモデル名を必ず明記してください。【SKILLファイル参照】.github\skills\update API specification\SKILL.mdおよび.github/skills/update sequence diagram/SKILL.mdを参照して、指定されたフォーマットに従って資料を更新してください。"
+          ISSUE_BODY="サブモジュールが更新されました。更新された内容をもとに機能定義書.mdとシーケンス図.mdを更新してください。【注意】このリポジトリにはサブモジュール（repository-A/, repository-B/）が含まれています。サブモジュールの内容も必ず確認し、機能定義書.md・シーケンス図.mdから説明を削除しないでください。サブモジュールの内容は 'git submodule update --init --recursive' で取得できます。【追加指示】AGENTS.mdを必ず参照してプロジェクトの設計思想を理解した上で、機能定義書.md・シーケンス図.mdの更新履歴セクションに今回利用したAIモデル名を必ず明記し、各ファイルの最後にある「最終更新日時（日本時間）」を現在の日本時間に更新してください。【SKILLファイル参照】.github\skills\update API specification\SKILL.mdおよび.github/skills/update sequence diagram/SKILL.mdを参照して、指定されたフォーマットに従って資料を更新してください。"
           ISSUE_URL=$(gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" --assignee "@copilot" --repo "$GITHUB_REPOSITORY")
           echo "Created issue: $ISSUE_URL"
           ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
